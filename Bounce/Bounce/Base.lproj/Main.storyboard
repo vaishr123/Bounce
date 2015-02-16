@@ -2,6 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="bVf-fG-KPa">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--View Controller-->
@@ -16,9 +17,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="StartScreen" translatesAutoresizingMaskIntoConstraints="NO" id="Obh-Uc-fGr">
-                                <rect key="frame" x="0.0" y="0.0" width="673" height="378"/>
-                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5eT-jW-RUx">
                                 <rect key="frame" x="68" y="216" width="184" height="95"/>
                                 <state key="normal">
@@ -28,8 +26,18 @@
                                     <segue destination="LVB-YS-i5n" kind="presentation" id="h7u-g7-zJf"/>
                                 </connections>
                             </button>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="StartScreen" translatesAutoresizingMaskIntoConstraints="NO" id="Obh-Uc-fGr">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                            </imageView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="UaB-1D-yiV" firstAttribute="top" secondItem="Obh-Uc-fGr" secondAttribute="bottom" id="Hds-XD-8tl"/>
+                            <constraint firstItem="Obh-Uc-fGr" firstAttribute="leading" secondItem="HgA-ZM-J0q" secondAttribute="leadingMargin" constant="-16" id="LVo-UI-eVm"/>
+                            <constraint firstAttribute="centerX" secondItem="Obh-Uc-fGr" secondAttribute="centerX" id="ZPU-BX-2Yc"/>
+                            <constraint firstAttribute="centerY" secondItem="Obh-Uc-fGr" secondAttribute="centerY" id="gNZ-fh-KzR"/>
+                            <constraint firstItem="Obh-Uc-fGr" firstAttribute="top" secondItem="HgA-ZM-J0q" secondAttribute="topMargin" id="yVV-X5-Mg1"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="LMv-Tf-a1W" userLabel="First Responder" sceneMemberID="firstResponder"/>

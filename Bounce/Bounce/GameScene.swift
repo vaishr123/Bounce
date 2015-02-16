@@ -25,13 +25,25 @@ var DonutTimer: NSTimer?;
 var BombTimer: NSTimer?;
 var scoreLabelNode:SKLabelNode!
 var score = 0;
+var x = CGFloat(0);
+var speed = CGFloat(0);
+var y = CGFloat(0);
+var bombspeed = CGFloat(0);
+var highscore = 0;
+let action = SKAction.rotateByAngle(CGFloat(-0.0866666), duration:0.6);
+let action2 = SKAction.rotateByAngle(CGFloat(0.0866666), duration:0.6);
+let action3 = SKAction.playSoundFileNamed("endgame.mp3", waitForCompletion: false);
+let action4 = SKAction.playSoundFileNamed("coin.mp3", waitForCompletion: false);
+
 
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMoveToView(view: SKView) {
         
-    //Volume
+    //Set up gravity for game
+        self.physicsWorld.contactDelegate = self;
+        self.physicsWorld.gravity = CGVectorMake(0, -17.8);
         
     //Default score value back to zero
         score = 0;
@@ -52,10 +64,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         screenLabel.position = CGPointMake( CGRectGetMidX( self.frame ), 10 * self.frame.size.height / 12 )
         screenLabel.zPosition = 8;
         self.addChild(screenLabel)
-
-    //Set up gravity for game
-        self.physicsWorld.contactDelegate = self;
-        self.physicsWorld.gravity = CGVectorMake(0, -17.8);
         
     //Add left icicle
         var leftIcicleTexture = SKTexture(imageNamed: "icicle.png");
@@ -145,6 +153,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         var bombTexture = SKTexture(imageNamed: "bomb.png");
         
+        var bombSide = rand() % 2;
+        
+        switch (bombSide){
+        case (0):
+            y = CGFloat(self.frame.size.width);
+            bombspeed = CGFloat(-350);
+
+        default:
+            y = CGFloat(0);
+            bombspeed = CGFloat(350);
+        }
+        
         bombTexture.filteringMode = SKTextureFilteringMode.Nearest;
         var bomb = SKSpriteNode(texture: bombTexture);
         bomb.setScale(0.07);
@@ -153,9 +173,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let newPercent:Int = Int(percent);
         let finalpercent: CGFloat = CGFloat(newPercent%40 + 25);
         let percentUse: CGFloat = CGFloat(finalpercent * 0.01);
-        bomb.position = CGPointMake(0, self.frame.size.height * percentUse);
+        bomb.position = CGPointMake(y, self.frame.size.height * percentUse);
         bomb.physicsBody?.affectedByGravity = false;
-        bomb.physicsBody?.velocity = CGVectorMake(250, 0);
+        bomb.physicsBody?.velocity = CGVectorMake(bombspeed, 0);
         bomb.physicsBody?.categoryBitMask = bombCategory;
         bomb.physicsBody?.contactTestBitMask = penguinCategory | penguin2Category;
         bomb.physicsBody?.collisionBitMask = penguinCategory | penguin2Category;
@@ -165,7 +185,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func Timer(){
-        var myTimer = NSTimer.scheduledTimerWithTimeInterval(0.01, target: self, selector: Selector("CheckPenguinPosition"), userInfo: nil, repeats: true)
+        var myTimer = NSTimer.scheduledTimerWithTimeInterval(0.03, target: self, selector: Selector("CheckPenguinPosition"), userInfo: nil, repeats: true)
    	}
     
     func CheckPenguinPosition() {
@@ -188,7 +208,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             Penguin.physicsBody?.contactTestBitMask = donutCategory | floorCategory;
             Penguin.physicsBody?.collisionBitMask = donutCategory | floorCategory;
             self.addChild(Penguin);
-            let action = SKAction.rotateByAngle(CGFloat(-0.0866666/1.5), duration:0.6)
             Penguin.runAction(SKAction.repeatAction(action, count: 1))
 
         }
@@ -202,8 +221,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             Penguin2.physicsBody?.contactTestBitMask = donutCategory | floorCategory;
             Penguin2.physicsBody?.collisionBitMask = donutCategory | floorCategory;
             self.addChild(Penguin2);
-            let action = SKAction.rotateByAngle(CGFloat(0.0866666/1.5), duration:0.6)
-            Penguin2.runAction(SKAction.repeatAction(action, count: 1))
+            Penguin2.runAction(SKAction.repeatAction(action2, count: 1))
         }
     
     func CreateDonuts() {
@@ -223,19 +241,32 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             default:
                 return;
         }
+        var donutSide = rand() % 2;
+
+        switch(donutSide) {
+            case(0):
+                x = CGFloat(self.frame.size.width);
+                speed = CGFloat(-280);
+            
+            default:
+                x = CGFloat(0);
+                speed = CGFloat(280);
+        }
         
         donutTexture.filteringMode = SKTextureFilteringMode.Nearest;
         var donut = SKSpriteNode(texture: donutTexture);
         donut.setScale(0.033);
-        donut.physicsBody = SKPhysicsBody(circleOfRadius: donut.size.height/3.4);
+        donut.physicsBody = SKPhysicsBody(circleOfRadius: donut.size.height/2.5);
         var percent = rand()
         let newPercent:Int = Int(percent);
         let finalpercent: CGFloat = CGFloat(newPercent%40 + 25);
         let percentUse: CGFloat = CGFloat(finalpercent * 0.01);
-        donut.position = CGPointMake(0, self.frame.size.height * percentUse);
+        donut.position = CGPointMake(x, self.frame.size.height * percentUse);
         donut.physicsBody?.affectedByGravity = false;
-        donut.physicsBody?.velocity = CGVectorMake(250, 0);
+        donut.physicsBody?.velocity = CGVectorMake(speed, 0);
         donut.physicsBody?.categoryBitMask = donutCategory;
+        donut.physicsBody?.contactTestBitMask = penguin2Category | penguinCategory;
+        donut.physicsBody?.collisionBitMask = penguinCategory | penguin2Category;
 
         self.addChild(donut);
     }
@@ -251,11 +282,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             firstBody.node?.physicsBody?.dynamic = false;
             secondBody.node?.physicsBody?.dynamic = false;
             
-            let action2 = SKAction.rotateByAngle(CGFloat(-3.14), duration:0.15)
-            Penguin2.runAction(SKAction.repeatAction(action2, count: 5))
-            
-            let action4 = SKAction.playSoundFileNamed("endgame.mp3", waitForCompletion: false)
-            runAction(action4);
+            runAction(action3);
             
             var BombStartTimer = NSTimer.scheduledTimerWithTimeInterval(1.1, target: self, selector: Selector("CallEnd"), userInfo: nil, repeats: false)
             
@@ -266,11 +293,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             firstBody.node?.physicsBody?.dynamic = false;
             secondBody.node?.physicsBody?.dynamic = false;
             
-            let action2 = SKAction.rotateByAngle(CGFloat(-3.14), duration:0.15)
-            Penguin.runAction(SKAction.repeatAction(action2, count: 5))
-            
-            let action4 = SKAction.playSoundFileNamed("endgame.mp3", waitForCompletion: false)
-            runAction(action4);
+
+            runAction(action3);
             
             var BombStartTimer = NSTimer.scheduledTimerWithTimeInterval(1.1, target: self, selector: Selector("CallEnd"), userInfo: nil, repeats: false)
 
@@ -280,17 +304,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if ((((firstBody.categoryBitMask & penguin2Category) != 0) && ((secondBody.categoryBitMask & donutCategory) != 0)) || (((firstBody.categoryBitMask & donutCategory) != 0) && ((secondBody.categoryBitMask & penguin2Category) != 0)))
         
         {
-            firstBody.node?.removeFromParent();
-            secondBody.node?.removeFromParent();
             score++;
-            self.addChild(Penguin2);
-            
-            
-            let action3 = SKAction.playSoundFileNamed("coin.mp3", waitForCompletion: false)
-            runAction(action3);
-            
-            
+            runAction(action4);
+            if (firstBody == Penguin.physicsBody || firstBody == Penguin2.physicsBody)
+            {
+                secondBody.node?.removeFromParent();
+                //TODO: First body is the penguin reset its position
+                
+            }
+            else
+            {
+                //TODO: Second body is the penguin reset its position
+                firstBody.node?.removeFromParent();
+            }
             UpdateScore();
+            
+            //self.addChild(Penguin2);
+            
+            
+            
+            
+            
+           
             
 
             
@@ -356,6 +391,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         myLabel.position = CGPoint(x: self.frame.size.width * 0.58, y: self.frame.size.height * 0.430);
         myLabel.zPosition = 20;
         self.addChild(myLabel)
+        
+        if (score > highscore){
+            highscore = score;
+        }
+        
+        var HighestScore = String(highscore)
+        let myLabel2 = SKLabelNode(fontNamed:"MarkerFelt-Wide")
+        myLabel2.text = HighestScore;
+        myLabel2.fontSize = 55;
+        myLabel2.fontColor = UIColor.grayColor()
+        myLabel2.position = CGPoint(x: self.frame.size.width * 0.58, y: self.frame.size.height * 0.330);
+        myLabel2.zPosition = 20;
+        self.addChild(myLabel2)
 
         endGame = true;
     }
